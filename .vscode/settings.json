@@ -1,0 +1,12 @@
+{
+    "cSpell.enableFiletypes": [
+        "shellscript"
+    ],
+    "cSpell.words": [
+        "autoload",
+        "brctl",
+        "mktemp",
+        "NOPASSWD",
+        "Zettlr"
+    ]
+}
