@@ -1,24 +1,17 @@
 #!/bin/zsh
 
-# This script backs up all of my important files. This is designed specifically for my
-# MacOS system, and is not applicable anywhere else without adaptation.
+# This script ensures that the backups are downloaded before the main backup scripts run.
 
-# The crontab is:
-# 0 19 * * * /usr/bin/sudo /Users/${desired_user}/Coding/scripts/BackupScripts/Backup.zsh >> /Users/${desired_user}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/Logs/Backup.log
-
-local time=$(date)
-echo "This script was run at $time. \n"
-filename_safe_time=$(date +"%Y-%m-%d_%H-%M-%S")
+# Note that the crontab is:
+# 50 18 * * * /Users/${desired_user}/Coding/scripts/BackupScripts/BackupEnsureDownloaded.zsh >> /Users/${desired_user}/Coding/scripts/BackupScripts/BackupEnsureDownloaded.log
 
 # Setup colors properly using zsh.sourceforge.io/Doc/Release/User-Contributions.html#index-colors
-# Reference: echo $bold_color$fg[red]bold red ${reset_color}plain$'\e['$color[underline]m underlined
-# Total set is: black, red, green, yellow, blue, magenta, cyan, and white for colors,
-# bold, faint, standout, underline, blink, reverse, and conceal for intensity,
-# and none (reset all attributes to the defaults), normal (neither bold nor faint), no-standout, 
-# no-underline, no-blink, no-reverse, and no-conceal
-
 autoload -U colors
 colors
+
+# Recordkeeping
+local time=$(date)
+echo "This script was run at $bold_color$time$reset_color. \n"
 
 # Checks to see which user should be backed up. If there is only one user, that user is backed up.
 # Bases this on whether or not the user has a Notes directory in their home directory.
@@ -66,25 +59,37 @@ else
     exit 1
 fi
 
+# Determine disk space
+local remaining_disk_space_GB=$(df / | sed '1d' |
+    awk '
+        /^\/dev\/disk1s1s1/ {
+            avail_byte = $4 * 512
+            total_avail_gb = avail_byte / 1000000000
+
+            printf total_avail_gb }
+    '
+)
+
+local total_size_gb=$(df / | sed '1d' |
+    awk '/^\/dev\/disk1s1s1/ {
+            size_byte = $2 * 512     # df uses 512 byte blocks
+            total_size_gb = size_byte / 1000000000
+
+            printf total_size_gb }
+    '
+)
+
+if [ $((remaining_disk_space_GB/total_size_gb)) -lt 0.04 ]; then
+    echo "Too little disk space left, reason: free space percentage less than 4%."
+    exit 1
+fi
+
+if [ $((remaining_disk_space_GB)) -lt 10 ]; then
+    echo "Too little disk space left, reason: free space percentage less than 10GB."
+    exit 1
+fi
+
 # Running backup scripts.
 
-## Zettlr Backup
-echo "$bold_color Starting backup of Zettlr notes and configuration data. $reset_color"
-
-# Capture both stdout and stderr and pass them into log files. Also gets the exit code and prints whether the code ran successfully or not.
-tmp_stderr=$(mktemp)
-{ stdout=$(/Users/${desired_user}/Coding/scripts/BackupScripts/BackupZettlr.zsh $desired_user); } 2> "$tmp_stderr"
-local Zettlr_exit_code=$?
-stderr=$(<"$tmp_stderr")
-rm "$tmp_stderr"
-
-# Save the outputs to their log files
-echo -e "$date$stdout" >> /Users/${desired_user}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/Logs/BackupZettlr_stdout.log
-echo -e "$date$stderr" >> /Users/${desired_user}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/Logs/BackupZettlr_stderr.log
-
-if [ $Zettlr_exit_code -eq 0 ]; then
-    echo "$bold_color Zettlr backup completed successfully. $reset_color"
-else
-    echo "$bold_color Zettlr backup failed. $reset_color"
-    echo "$stderr"
-fi
+## Log Download
+find /Users/${desired_user}/Library/Mobile\ Documents/com~apple~CloudDocs/ScriptedBackups/Logs -type f -exec brctl download {} \;
