@@ -79,12 +79,12 @@ local total_size_gb=$(df / | sed '1d' |
     '
 )
 
-if [ $((remaining_disk_space_GB/total_size_gb)) -lt 0.04 ]; then
+if [ $((remaining_disk_space_GB/total_size_gb < 0.04)) ]; then
     echo "Too little disk space left, reason: free space percentage less than 4%."
     exit 1
 fi
 
-if [ $((remaining_disk_space_GB)) -lt 10 ]; then
+if [ $((remaining_disk_space_GB < 10.00)) ]; then
     echo "Too little disk space left, reason: free space percentage less than 10GB."
     exit 1
 fi
