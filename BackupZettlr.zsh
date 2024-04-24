@@ -10,7 +10,7 @@ colors
 # Recordkeeping
 local time=$(date)
 local current_user=$(id -un)
-echo "\nThis script was run at ${bold_color}${time}${reset_color}, by the user ${bold_color}${current_user}${reset_color}."
+echo "\n\nThis script was run at ${bold_color}${time}${reset_color}, by the user ${bold_color}${current_user}${reset_color}."
 
 # Desired user directory (argument 1)
 local desiredUser=$1

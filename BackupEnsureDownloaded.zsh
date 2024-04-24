@@ -11,7 +11,7 @@ colors
 
 # Recordkeeping
 local time=$(date)
-echo "This script was run at $bold_color$time$reset_color. \n"
+echo "\nThis script was run at $bold_color$time$reset_color."
 
 # Checks to see which user should be backed up. If there is only one user, that user is backed up.
 # Bases this on whether or not the user has a Notes directory in their home directory.
@@ -79,12 +79,13 @@ local total_size_gb=$(df / | sed '1d' |
     '
 )
 
-if [ $((remaining_disk_space_GB/total_size_gb < 0.04)) ]; then
+# For some reason 0 is true and 1 is false
+if [ $((remaining_disk_space_GB/total_size_gb < 0.04)) = 0 ]; then
     echo "Too little disk space left, reason: free space percentage less than 4%."
     exit 1
 fi
 
-if [ $((remaining_disk_space_GB < 10.00)) ]; then
+if [ $((remaining_disk_space_GB < 10.00)) = 0 ]; then
     echo "Too little disk space left, reason: free space percentage less than 10GB."
     exit 1
 fi

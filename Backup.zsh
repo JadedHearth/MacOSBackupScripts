@@ -7,7 +7,7 @@
 # 0 19 * * * /usr/bin/sudo /Users/${desired_user}/Coding/scripts/BackupScripts/Backup.zsh >> /Users/${desired_user}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/Logs/Backup.log
 
 local time=$(date)
-echo "This script was run at $time. \n"
+echo "\nThis script was run at $time."
 filename_safe_time=$(date +"%Y-%m-%d_%H-%M-%S")
 
 # Setup colors properly using zsh.sourceforge.io/Doc/Release/User-Contributions.html#index-colors
