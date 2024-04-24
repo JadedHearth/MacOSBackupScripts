@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-# This script backs up all of my important files. This is designed specifically for my
+# This script backs up all (disclaimer: not yet) of my important files. This is designed specifically for my
 # MacOS system, and is not applicable anywhere else without adaptation.
 
 # The crontab is:
@@ -66,7 +66,8 @@ else
     exit 1
 fi
 
-# Running backup scripts.
+# Running backup scripts. 
+# TODO: turn this into a for loop
 
 ## Zettlr Backup
 echo "$bold_color Starting backup of Zettlr notes and configuration data. $reset_color"
@@ -86,5 +87,26 @@ if [ $Zettlr_exit_code -eq 0 ]; then
     echo "$bold_color Zettlr backup completed successfully. $reset_color"
 else
     echo "$bold_color Zettlr backup failed. $reset_color"
+    echo "$stderr"
+fi
+
+## Thunderbird Backup
+echo "$bold_color Starting backup of Thunderbird profiles. $reset_color"
+
+# Capture both stdout and stderr and pass them into log files. Also gets the exit code and prints whether the code ran successfully or not.
+tmp_stderr=$(mktemp)
+{ stdout=$(/Users/${desired_user}/Coding/scripts/BackupScripts/BackupThunderbird.zsh $desired_user); } 2> "$tmp_stderr"
+local Thunderbird_exit_code=$?
+stderr=$(<"$tmp_stderr")
+rm "$tmp_stderr"
+
+# Save the outputs to their log files
+echo -e "$date$stdout" >> /Users/${desired_user}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/Logs/BackupThunderbird_stdout.log
+echo -e "$date$stderr" >> /Users/${desired_user}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/Logs/BackupThunderbird_stderr.log
+
+if [ $Thunderbird_exit_code -eq 0 ]; then
+    echo "$bold_color Thunderbird backup completed successfully. $reset_color"
+else
+    echo "$bold_color Thunderbird backup failed. $reset_color"
     echo "$stderr"
 fi
