@@ -89,7 +89,7 @@ if [ $((remaining_disk_space_GB < 10.00)) ]; then
     exit 1
 fi
 
-# Running backup scripts.
+# Running backup downloads.
 
 ## Log Download
 find /Users/${desired_user}/Library/Mobile\ Documents/com~apple~CloudDocs/ScriptedBackups/Logs -type f -exec brctl download {} \;
