@@ -110,3 +110,24 @@ else
     echo "$bold_color Thunderbird backup failed. $reset_color"
     echo "$stderr"
 fi
+
+## Stardew Valley Backup
+echo "$bold_color Starting backup of Stardew Valley saves and mods. $reset_color"
+
+# Capture both stdout and stderr and pass them into log files. Also gets the exit code and prints whether the code ran successfully or not.
+tmp_stderr=$(mktemp)
+{ stdout=$(/Users/${desired_user}/Coding/scripts/BackupScripts/BackupStardew.zsh $desired_user); } 2> "$tmp_stderr"
+local Stardew_exit_code=$?
+stderr=$(<"$tmp_stderr")
+rm "$tmp_stderr"
+
+# Save the outputs to their log files
+echo -e "$date$stdout" >> /Users/${desired_user}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/Logs/BackupStardew_stdout.log
+echo -e "$date$stderr" >> /Users/${desired_user}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/Logs/BackupStardew_stderr.log
+
+if [ $Stardew_exit_code -eq 0 ]; then
+    echo "$bold_color Stardew backup completed successfully. $reset_color"
+else
+    echo "$bold_color Stardew backup failed. $reset_color"
+    echo "$stderr"
+fi
