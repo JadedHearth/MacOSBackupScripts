@@ -29,12 +29,17 @@ echo "Starting backup with rsync."
 
 for save in /Users/${desiredUser}/Library/Application\ Support/Steam/steamapps/common/Stardew\ Valley/Contents/MacOS/save-backups/*; do 
     echo -e "${bold_color}\n$(basename "$save")${reset_color}"
-    rsync -av --exclude=".DS_Store" --exclude=".Trash/" "$save" /Users/${desiredUser}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/StardewBackup/save-backups;
+    rsync -av --delete-during --exclude=".DS_Store" --exclude=".Trash/" "$save" /Users/${desiredUser}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/StardewBackup/save-backups;
 done
 
 for mod in /Users/${desiredUser}/Library/Application\ Support/Steam/steamapps/common/Stardew\ Valley/Contents/MacOS/Mods/*; do 
     echo -e "${bold_color}\n$(basename "$mod")${reset_color}"
-    rsync -av --exclude=".DS_Store" --exclude=".Trash/" "$mod" /Users/${desiredUser}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/StardewBackup/Mods;
+    rsync -av --delete-before --exclude=".DS_Store" --exclude=".Trash/" "$mod" /Users/${desiredUser}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/StardewBackup/Mods;
+done
+
+for mod in /Users/${desiredUser}/Library/Application\ Support/Steam/steamapps/common/Stardew\ Valley/Contents/MacOS/ModsMultiplayer/*; do 
+    echo -e "${bold_color}\n$(basename "$mod")${reset_color}"
+    rsync -av --delete-before --exclude=".DS_Store" --exclude=".Trash/" "$mod" /Users/${desiredUser}/Library/Mobile\ Documents/com\~apple\~CloudDocs/ScriptedBackups/StardewBackup/Mods;
 done
 
 echo "Backup successful."
